@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @EnableAutoConfiguration
 @RestController
 public class Backend {
+  private static final Logger log = LoggerFactory.getLogger(Backend.class);
 
   @RequestMapping("/api")
   public String printDate(@RequestHeader(name = "user_name", required = false) String username) {
+    log.info("Hello world!");
     if (username != null) {
       return new Date().toString() + " " + username;
     }
@@ -22,7 +27,7 @@ public class Backend {
   public static void main(String[] args) {
     SpringApplication.run(Backend.class,
         "--spring.application.name=backend",
-        "--server.port=9000"
+        "--server.port=9001"
     );
   }
 }
