@@ -70,12 +70,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>okhttp</artifactId>
-      <!-- Intentionally OkHttp 3 as it doesn't have a Kotlin dependency -->
-      <version>3.14.9</version>
-    </dependency>
 
     <!-- Adds the MVC class and method names to server spans -->
     <dependency>
@@ -83,10 +77,6 @@
       <artifactId>brave-instrumentation-spring-webmvc</artifactId>
     </dependency>
     <!-- Instruments the underlying OkHttpClient requests that call the backend -->
-    <dependency>
-      <groupId>io.zipkin.brave</groupId>
-      <artifactId>brave-instrumentation-okhttp3</artifactId>
-    </dependency>
 
     <!-- Integrates so you can use log patterns like %X{traceId}/%X{spanId} -->
     <dependency>
@@ -95,18 +85,18 @@
     </dependency>
 
     <!-- The below are needed to report traces to http://127.0.0.1:9411/api/v2/spans -->
-    <dependency>
-      <groupId>io.zipkin.brave</groupId>
-      <artifactId>brave</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.zipkin.reporter2</groupId>
-      <artifactId>zipkin-reporter-brave</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.zipkin.reporter2</groupId>
-      <artifactId>zipkin-sender-okhttp3</artifactId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.zipkin.brave</groupId>-->
+<!--      <artifactId>brave</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>io.zipkin.reporter2</groupId>-->
+<!--      <artifactId>zipkin-reporter-brave</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>io.zipkin.reporter2</groupId>-->
+<!--      <artifactId>zipkin-sender-okhttp3</artifactId>-->
+<!--    </dependency>-->
   </dependencies>
 
   <build>

@@ -9,7 +9,6 @@ import brave.baggage.BaggagePropagationConfig.SingleBaggageField;
 import brave.baggage.CorrelationScopeConfig.SingleCorrelationField;
 import brave.context.slf4j.MDCScopeDecorator;
 import brave.http.HttpTracing;
-import brave.okhttp3.TracingInterceptor;
 import brave.propagation.B3Propagation;
 import brave.propagation.CurrentTraceContext;
 import brave.propagation.CurrentTraceContext.ScopeDecorator;
@@ -17,20 +16,15 @@ import brave.propagation.Propagation;
 import brave.propagation.ThreadLocalCurrentTraceContext;
 import brave.servlet.TracingFilter;
 import brave.spring.webmvc.SpanCustomizingAsyncHandlerInterceptor;
-import javax.servlet.Filter;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import zipkin2.reporter.Sender;
-import zipkin2.reporter.brave.AsyncZipkinSpanHandler;
-import zipkin2.reporter.okhttp3.OkHttpSender;
+
+import javax.servlet.Filter;
 
 /** This adds tracing configuration to any web mvc controllers or rest template clients. */
 @Configuration
@@ -59,16 +53,16 @@ public class TracingAutoConfiguration {
         .build();
   }
 
-  /** Configuration for how to send spans to Zipkin */
-  @Bean Sender sender(
-      @Value("${zipkin.baseUrl:http://127.0.0.1:9411}/api/v2/spans") String zipkinEndpoint) {
-    return OkHttpSender.create(zipkinEndpoint);
-  }
-
-  /** Configuration for how to buffer spans into messages for Zipkin */
-  @Bean AsyncZipkinSpanHandler zipkinSpanHandler(Sender sender) {
-    return AsyncZipkinSpanHandler.create(sender);
-  }
+//  /** Configuration for how to send spans to Zipkin */
+//  @Bean Sender sender(
+//      @Value("${zipkin.baseUrl:http://127.0.0.1:9411}/api/v2/spans") String zipkinEndpoint) {
+//    return OkHttpSender.create(zipkinEndpoint);
+//  }
+//
+//  /** Configuration for how to buffer spans into messages for Zipkin */
+//  @Bean AsyncZipkinSpanHandler zipkinSpanHandler(Sender sender) {
+//    return AsyncZipkinSpanHandler.create(sender);
+//  }
 
   /** Controls aspects of tracing such as the service name that shows up in the UI */
   @Bean Tracing tracing(
@@ -76,15 +70,15 @@ public class TracingAutoConfiguration {
       @Value("${brave.supportsJoin:true}") boolean supportsJoin,
       @Value("${brave.traceId128Bit:false}") boolean traceId128Bit,
       Propagation.Factory propagationFactory,
-      CurrentTraceContext currentTraceContext,
-      AsyncZipkinSpanHandler zipkinSpanHandler) {
+      CurrentTraceContext currentTraceContext/*,
+      AsyncZipkinSpanHandler zipkinSpanHandler*/) {
     return Tracing.newBuilder()
         .localServiceName(serviceName)
         .supportsJoin(supportsJoin)
         .traceId128Bit(traceId128Bit)
         .propagationFactory(propagationFactory)
         .currentTraceContext(currentTraceContext)
-        .addSpanHandler(zipkinSpanHandler).build();
+        /*.addSpanHandler(zipkinSpanHandler)*/.build();
   }
 
   /** Allows someone to add tags to a span if a trace is in progress. */
@@ -111,17 +105,5 @@ public class TracingAutoConfiguration {
         registry.addInterceptor(webMvcTracingCustomizer);
       }
     };
-  }
-
-  /**
-   * Creates client spans for HTTP requests.
-   *
-   * <p>{@link OkHttpClient} because {@link OkHttp3ClientHttpRequestFactory} doesn't take a
-   * {@link Call.Factory}
-   */
-  @Bean OkHttpClient tracedOkHttpClient(HttpTracing httpTracing) {
-    return new OkHttpClient.Builder()
-        .addNetworkInterceptor(TracingInterceptor.create(httpTracing))
-        .build();
   }
 }
